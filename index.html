@@ -355,8 +355,11 @@ loadPackets();
 
 // === DREAMS ===
 const dreamsEl = document.getElementById('dreams');
+const FLOCK_VIEW = new URLSearchParams(window.location.search).has('bones');
 async function loadDreams() {
-  const { data } = await supabase.from('flock_dreams').select('*').order('created_at', { ascending: false }).limit(20);
+  let query = supabase.from('flock_dreams').select('*').order('created_at', { ascending: false }).limit(20);
+  if (!FLOCK_VIEW) query = query.eq('visibility', 'public');
+  const { data } = await query;
   if (!data || data.length === 0) { dreamsEl.innerHTML = '<div class="empty">quiet</div>'; return; }
   dreamsEl.innerHTML = data.map(d => `
     <div class="dream">
